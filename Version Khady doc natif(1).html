@@ -1,0 +1,101 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body onload="init()">
+		<div><input id="zone_ville" type="text" class="form-control" value="Rodez"><br><br></div>
+		<div class="text-center">
+			<h1 id="city_name">Temps actuel</h1>
+			<img id="img_temps">
+			<div id="temperature"></div>
+			<div id="description"></div>
+		</div>
+		<div class="text-center">
+		<hr>
+		<h1>Prévisions</h1>
+		</div>
+		<div>
+			<table id="previsions" class="table table-striped table-bordered" style="width:100%">
+				<thead>
+					<tr>
+						<th>Date et heure</th>
+						<th>Température</th>
+						<th>Description</th>
+						<th>Icône</th>
+					</tr>
+				</thead>
+				<tbody id="bodytable">
+				
+				</tbody>
+			</table>
+		</div>
+		<script type="text/javascript">
+			/*quand le document html est prêt et chargé
+			on passe à l'initialisation des fonctions javascript */
+			
+			function init() {
+				document.getElementById('zone_ville').addEventListener('keypress', function(event) {
+					if (event.keyCode==13) {
+						getWeather();
+						getForecast();
+					}
+				});
+			
+				getWeather();
+				getForecast();
+			}
+			
+			
+			function getForecast() {
+				//initialisation HTTPRequest
+				var xhttp = new XMLHttpRequest();
+				//on lui affecte une fonction quand HTTPREQUEST reçoit des informations
+					xhttp.onreadystatechange = function() {
+						//vérification que la requête HTTP est effectuée (readyState 4) et qu'elle s'est bien passée (status 200)
+						if (this.readyState == 4 && this.status == 200) {
+						// Typical action to be performed when the document is ready:
+							var obj=JSON.parse(xhttp.responseText);
+							var html='';
+							for ( var i=0, ien=obj.list.length ; i<ien ; i++ ) {
+									html+='<tr>';
+									/* traitement de la date, on met au format français */
+									var d=new Date(obj.list[i].dt_txt);
+									html+="<td>"+d.toLocaleDateString()+" "+d.toLocaleTimeString()+"</td>";
+									html+= "<td>"+obj.list[i].main.temp+" °C"+"</td>";
+									html+="<td>"+obj.list[i].weather[0].description+"</td>";
+									html+='<td><img src="http://openweathermap.org/img/wn/'+obj.list[i].weather[0].icon+'@2x.png"></td>';
+									html+="</tr>";
+								  }
+							document.getElementById('bodytable').innerHTML=html;
+						
+						}
+					};
+					xhttp.open("GET", "https://api.openweathermap.org/data/2.5/forecast?q="+document.getElementById('zone_ville').value+"&appid=9d63106b0003583259d7d973d5addfa9&units=metric&lang=fr", true);
+					xhttp.send();
+			}
+			
+			function getWeather() {
+				//initialisation HTTPRequest
+				var xhttp = new XMLHttpRequest();
+				//on lui affecte une fonction quand HTTPREQUEST reçoit des informations
+					xhttp.onreadystatechange = function() {
+						//vérification que la requête HTTP est effectuée (readyState 4) et qu'elle s'est bien passée (status 200)
+						if (this.readyState == 4 && this.status == 200) {
+						// Typical action to be performed when the document is ready:
+							var obj=JSON.parse(xhttp.responseText);
+							document.getElementById('img_temps').setAttribute('src','http://openweathermap.org/img/wn/'+obj.weather[0].icon+'@2x.png');
+							document.getElementById('temperature').innerHTML=obj.main.temp+" °C";
+							document.getElementById('description').innerHTML=obj.weather[0].description;
+							document.getElementById('city_name').innerHTML=obj.name;
+						
+						}
+					};
+					xhttp.open("GET", "https://api.openweathermap.org/data/2.5/weather?q="+document.getElementById('zone_ville').value+"&appid=9d63106b0003583259d7d973d5addfa9&lang=fr&units=metric", true);
+					xhttp.send();
+			}
+			
+		
+		</script>
+	</body>
+</html>

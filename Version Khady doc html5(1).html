@@ -1,0 +1,14 @@
+<!DOCTYPE html> 
+<html lang="fr"> 
+    <head>
+        <meta charset="utf-8">
+        <title>API</title>
+    </head>
+    <body> 
+	<script type="text/javascript">
+	fetch("https://api.openweathermap.org/data/2.5/weather?q=nantes&appid=9d63106b0003583259d7d973d5addfa9&lang=ar")
+	.then(x => x.json())
+	.then(y => document.write(y.weather[0].description));
+	</script>
+	</body>
+</html>
